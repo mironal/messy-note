@@ -21,3 +21,12 @@ div.Editor {
   background: lightgray;
   flex-grow: 1;
 }
+
+li.NoteListItem {
+  transition: background-color 200ms;
+}
+
+li.NoteListItem:hover {
+  background-color: #cccccc;
+  transition: background-color 200ms;
+}

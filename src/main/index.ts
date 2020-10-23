@@ -1,6 +1,14 @@
-import { app, BrowserWindow } from "electron"
+import { app, BrowserWindow, ipcMain } from "electron"
+import { NoteManager } from "./notes"
+import bunyan from "bunyan"
+
+const log = bunyan.createLogger({ name: "main" })
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any
+
+const noteManager = new NoteManager(app.getPath("userData"))
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -13,6 +21,11 @@ const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
+    webPreferences: {
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
   })
 
   // and load the index.html of the app.
@@ -20,12 +33,31 @@ const createWindow = (): void => {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
+
+  noteManager.on("change-notes", (notes) => {
+    log.info(notes, "send change-notes event to main window")
+    mainWindow.webContents.send("change-notes", notes)
+  })
 }
+
+ipcMain.handle("create-note", () => {
+  log.info("handle create-notes")
+  noteManager.createNewNote()
+})
+
+ipcMain.handle("reload-note", () => {
+  log.info("handle reload-notes")
+  noteManager.reload()
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", createWindow)
+
+app.on("ready", () => {
+  noteManager.start()
+})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
