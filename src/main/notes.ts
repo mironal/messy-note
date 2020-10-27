@@ -61,6 +61,10 @@ export class NoteManager extends events.EventEmitter {
     return fs.promises.writeFile(note.path, noteText, "utf-8")
   }
 
+  async deleteNote({ path }: Note): Promise<void> {
+    return fs.promises.unlink(path)
+  }
+
   private async emitNotes() {
     const entries = await fs.promises.readdir(this.notesDirPath, {
       withFileTypes: true,

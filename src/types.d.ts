@@ -10,6 +10,10 @@ declare global {
       saveNote: (note: Note, noteText: string) => Promise<void>
       readNote: (note: Note) => Promise<string>
     }
+
+    menu: {
+      showSidebarItemMenu: (note: Note) => void
+    }
   }
 }
 

@@ -16,3 +16,8 @@ contextBridge.exposeInMainWorld("notes", {
   readNote: (note: Note): Promise<string> =>
     ipcRenderer.invoke("read-note", note),
 })
+
+contextBridge.exposeInMainWorld("menu", {
+  showSidebarItemMenu: (note: Note) =>
+    ipcRenderer.send("show-sidebar-item-menu", note),
+})

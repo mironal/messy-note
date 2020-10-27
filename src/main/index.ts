@@ -1,6 +1,7 @@
-import { app, BrowserWindow, ipcMain } from "electron"
+import { app, BrowserWindow, ipcMain, Menu, MenuItem } from "electron"
 import { NoteManager } from "./notes"
 import bunyan from "bunyan"
+import { showSidebarItemMenu } from "./menus"
 
 const log = bunyan.createLogger({ name: "main" })
 
@@ -57,6 +58,8 @@ ipcMain.handle("read-note", (ev, note) => {
 ipcMain.handle("save-note", (ev, note, noteText) => {
   return noteManager.saveNote(note, noteText)
 })
+
+ipcMain.on("show-sidebar-item-menu", showSidebarItemMenu(noteManager))
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

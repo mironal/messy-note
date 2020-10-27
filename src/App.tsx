@@ -31,6 +31,7 @@ const App = () => {
           selectingNote={selectingNote}
           onClickAddNote={window.notes.createNote}
           onSelectNote={setSelectingNote}
+          onContextMenu={window.menu.showSidebarItemMenu}
         />
         <Editor note={selectingNote} />
       </SplitPane>
