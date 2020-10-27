@@ -50,6 +50,14 @@ ipcMain.handle("reload-note", () => {
   noteManager.reload()
 })
 
+ipcMain.handle("read-note", (ev, note) => {
+  return noteManager.readNoteText(note)
+})
+
+ipcMain.handle("save-note", (ev, note, noteText) => {
+  return noteManager.saveNote(note, noteText)
+})
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

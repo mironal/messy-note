@@ -7,6 +7,8 @@ declare global {
       createNote: () => Promise<void>
       reload: () => Promise<void>
       onChangeNotes: (listener: (filenames: Note[]) => void) => () => void
+      saveNote: (note: Note, noteText: string) => Promise<void>
+      readNote: (note: Note) => Promise<string>
     }
   }
 }

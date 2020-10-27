@@ -11,4 +11,8 @@ contextBridge.exposeInMainWorld("notes", {
       ipcRenderer.removeListener("change-notes", listener)
     }
   },
+  saveNote: (note: Note, noteText: string): Promise<void> =>
+    ipcRenderer.invoke("save-note", note, noteText),
+  readNote: (note: Note): Promise<string> =>
+    ipcRenderer.invoke("read-note", note),
 })

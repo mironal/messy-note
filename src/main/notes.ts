@@ -14,6 +14,7 @@ export declare interface NoteManager {
 export class NoteManager extends events.EventEmitter {
   static readonly NOTES_JSON_NAME = "notes.json"
   static readonly NOTES_DIRECTORY_NAME = "notes"
+  static readonly NOTE_EXTENSION = "messynote"
 
   private notesJsonPath: string
   private notesDirPath: string
@@ -50,6 +51,14 @@ export class NoteManager extends events.EventEmitter {
     })
 
     log.info(newNotePath, "created")
+  }
+
+  async readNoteText(note: Note): Promise<string> {
+    return fs.promises.readFile(note.path, "utf-8")
+  }
+
+  async saveNote(note: Note, noteText: string): Promise<void> {
+    return fs.promises.writeFile(note.path, noteText, "utf-8")
   }
 
   private async emitNotes() {

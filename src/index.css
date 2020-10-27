@@ -19,6 +19,13 @@ div.Sidebar {
 
 div.Editor {
   background: lightgray;
+  display:flex;
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+.Editor > textarea {
+
   flex-grow: 1;
 }
 
