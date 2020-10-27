@@ -7,6 +7,7 @@ export type SidebarProps = {
   selectingNote: Note | undefined
   onClickAddNote: () => void
   onSelectNote: (note: Note) => void
+  onContextMenu?: (note: Note) => any
 }
 
 export const Sidebar = ({
@@ -14,6 +15,7 @@ export const Sidebar = ({
   selectingNote,
   onClickAddNote,
   onSelectNote,
+  onContextMenu,
 }: SidebarProps): JSX.Element => {
   return (
     <div className="Sidebar">
@@ -25,6 +27,7 @@ export const Sidebar = ({
             note={note}
             key={note.path}
             onClick={onSelectNote}
+            onContextMenu={onContextMenu}
           />
         ))}
       </ul>
@@ -36,10 +39,15 @@ type NoteListItemProps = {
   isSelected: boolean
   note: Note
   onClick: (note: Note) => any
+  onContextMenu?: (note: Note) => any
 }
-const NoteListItem = ({ note, onClick }: NoteListItemProps) => {
+const NoteListItem = ({ note, onClick, onContextMenu }: NoteListItemProps) => {
   return (
-    <li className="NoteListItem" onClick={() => onClick(note)}>
+    <li
+      className="NoteListItem"
+      onClick={() => onClick(note)}
+      onContextMenu={() => onContextMenu && onContextMenu(note)}
+    >
       <p>{note.name}</p>
     </li>
   )

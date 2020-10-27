@@ -4,6 +4,7 @@ import { Editor } from "./Editor"
 import { Sidebar } from "./Sidebar"
 import { Note } from "./types"
 import SplitPane from "react-split-pane"
+import { useLocalStorage } from "react-use"
 
 const App = () => {
   const [notes, setNotes] = useState<Note[]>([])
@@ -15,9 +16,16 @@ const App = () => {
     return off
   }, [])
 
+  const [sidebarWidth, setSidebarWidth] = useLocalStorage("sidebar-width", 200)
+
   return (
     <div className="Container">
-      <SplitPane split="vertical" minSize={100} defaultSize={"20%"}>
+      <SplitPane
+        split="vertical"
+        minSize={100}
+        size={sidebarWidth}
+        onChange={setSidebarWidth}
+      >
         <Sidebar
           notes={notes}
           selectingNote={selectingNote}
