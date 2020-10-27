@@ -40,7 +40,7 @@ type NoteListItemProps = {
 const NoteListItem = ({ note, onClick }: NoteListItemProps) => {
   return (
     <li className="NoteListItem" onClick={() => onClick(note)}>
-      {note.name}
+      <p>{note.name}</p>
     </li>
   )
 }
