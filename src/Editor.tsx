@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "react-dom"
 import { Note } from "./types"
-import { useDebounce, useLifecycles } from "react-use"
+import { useDebounce } from "react-use"
 
 export type EditorProps = {
   note: Note | null
@@ -10,7 +10,7 @@ export type EditorProps = {
 export const Editor = ({ note }: EditorProps) => {
   const [noteText, setNoteText] = useState<string | null>(null)
 
-  const [] = useDebounce(
+  const [, cancelSaveNote] = useDebounce(
     () => {
       if (noteText !== null) {
         window.notes.saveNote(note, noteText)
@@ -26,6 +26,7 @@ export const Editor = ({ note }: EditorProps) => {
       window.notes.readNote(note).then(setNoteText)
     }
     return () => {
+      cancelSaveNote()
       setNoteText(null)
     }
   }, [note])
