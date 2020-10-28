@@ -1,9 +1,10 @@
-import fs, { FSWatcher } from "fs"
+import fs, { FSWatcher, watchFile } from "fs"
 import events from "events"
 import path from "path"
 import bunyan from "bunyan"
 import { v4 as uuidv4 } from "uuid"
 import { Note } from "../types"
+import chokidar from "chokidar"
 
 const log = bunyan.createLogger({ name: "NoteManager" })
 
@@ -14,12 +15,12 @@ export declare interface NoteManager {
 export class NoteManager extends events.EventEmitter {
   static readonly NOTES_JSON_NAME = "notes.json"
   static readonly NOTES_DIRECTORY_NAME = "notes"
-  static readonly NOTE_EXTENSION = "messynote"
+  static readonly NOTE_EXTENSION = "mnote"
 
   private notesJsonPath: string
   private notesDirPath: string
-  private watcher: FSWatcher | null = null
   private notes: Note[] = []
+  private watcher: chokidar.FSWatcher
 
   /**
    *
@@ -44,7 +45,8 @@ export class NoteManager extends events.EventEmitter {
 
   async createNewNote() {
     const uuid = uuidv4()
-    const newNotePath = path.join(this.notesDirPath, uuid)
+    const newNotePath =
+      path.join(this.notesDirPath, uuid) + "." + NoteManager.NOTE_EXTENSION
 
     await fs.promises.writeFile(path.join(this.notesDirPath, uuid), "", {
       encoding: "utf-8",
@@ -66,16 +68,14 @@ export class NoteManager extends events.EventEmitter {
   }
 
   private async emitNotes() {
-    const entries = await fs.promises.readdir(this.notesDirPath, {
-      withFileTypes: true,
+    const watchedFiles = this.watcher.getWatched()
+    const notes = watchedFiles[this.notesDirPath]
+    this.notes = notes.map((n) => {
+      return {
+        path: path.join(this.notesDirPath, n),
+        name: n,
+      }
     })
-
-    this.notes = entries
-      .filter((ent) => ent.isFile())
-      .map((f) => ({
-        path: path.join(this.notesDirPath, f.name),
-        name: f.name,
-      }))
 
     this.emit("change-notes", this.notes)
   }
@@ -115,13 +115,16 @@ export class NoteManager extends events.EventEmitter {
       log.warn(`Watching ${this.notesDirPath} has already started.`)
       return
     }
-    this.watcher = fs.watch(
-      this.notesDirPath,
-      (event: string, filename: string) => {
-        log.warn(`Change: event => ${event}, filename => ${filename}`)
-        this.emitNotes()
+    this.watcher = chokidar.watch(
+      this.notesDirPath + "/*." + NoteManager.NOTE_EXTENSION,
+      {
+        ignored: /(^|[\/\\])\../, // ignore dotfiles
       }
     )
-    this.emitNotes()
+    this.watcher
+      .on("ready", () => this.emitNotes())
+      .on("change", () => this.emitNotes())
+      .on("unlink", () => this.emitNotes())
+      .on("error", log.error)
   }
 }
