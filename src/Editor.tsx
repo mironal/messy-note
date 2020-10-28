@@ -9,10 +9,11 @@ export type EditorProps = {
 
 export const Editor = ({ note }: EditorProps) => {
   const [noteText, setNoteText] = useState<string | null>(null)
+  const [activateSave, setActivateSave] = useState(false)
 
-  const [, cancelSaveNote] = useDebounce(
+  const [isReady, cancelSaveNote] = useDebounce(
     () => {
-      if (noteText !== null) {
+      if (noteText !== null && activateSave) {
         window.notes.saveNote(note, noteText)
         console.log("save note")
       }
@@ -28,17 +29,33 @@ export const Editor = ({ note }: EditorProps) => {
     return () => {
       cancelSaveNote()
       setNoteText(null)
+      setActivateSave(false)
     }
   }, [note])
 
   const onChangeText = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (noteText !== null) {
       setNoteText(ev.target.value)
+      setActivateSave(true)
     }
   }
+
+  const SaveState = (() => {
+    const ready = isReady()
+    if (ready === true) {
+      return "Saved"
+    } else if (ready === false) {
+      return "Pending save..."
+    } else {
+      return ""
+    }
+  })()
+
   return (
     <div className="Editor">
-      <h2>{note ? note.name : "undefined"}</h2>
+      <h2>
+        {note ? note.name : "undefined"}: {SaveState}
+      </h2>
       {noteText !== null && (
         <textarea value={noteText} onChange={onChangeText} />
       )}
