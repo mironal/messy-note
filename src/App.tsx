@@ -11,17 +11,17 @@ const App = () => {
   const [selectingNote, setSelectingNote] = useState<Note | null>(null)
 
   useEffect(() => {
-    const off = window.notes.onChangeNotes((notes) => {
-      setNotes(notes)
-
-      // 選択している note がなくなった場合は selectingNote も null にする
-      if (selectingNote && !notes.some((n) => n.path == selectingNote.path)) {
-        setSelectingNote(null)
-      }
-    })
+    const off = window.notes.onChangeNotes(setNotes)
     window.notes.reload()
     return off
   }, [])
+
+  useEffect(() => {
+    // 選択している note がなくなった場合は selectingNote も null にする
+    if (selectingNote && !notes.some((n) => n.path == selectingNote.path)) {
+      setSelectingNote(null)
+    }
+  }, [notes])
 
   const [sidebarWidth, setSidebarWidth] = useLocalStorage("sidebar-width", 200)
 

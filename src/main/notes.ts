@@ -48,7 +48,7 @@ export class NoteManager extends events.EventEmitter {
     const newNotePath =
       path.join(this.notesDirPath, uuid) + "." + NoteManager.NOTE_EXTENSION
 
-    await fs.promises.writeFile(path.join(this.notesDirPath, uuid), "", {
+    await fs.promises.writeFile(newNotePath, "", {
       encoding: "utf-8",
     })
 
@@ -124,6 +124,7 @@ export class NoteManager extends events.EventEmitter {
     this.watcher
       .on("ready", () => this.emitNotes())
       .on("change", () => this.emitNotes())
+      .on("add", () => this.emitNotes())
       .on("unlink", () => this.emitNotes())
       .on("error", log.error)
   }
