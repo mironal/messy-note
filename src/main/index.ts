@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Menu, MenuItem } from "electron"
 import { NoteManager } from "./notes"
 import bunyan from "bunyan"
-import { showSidebarItemMenu } from "./menus"
+import { menuTemplate, showSidebarItemMenu } from "./menus"
 
 const log = bunyan.createLogger({ name: "main" })
 
@@ -89,3 +89,5 @@ app.on("activate", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+const menu = Menu.buildFromTemplate(menuTemplate)
+Menu.setApplicationMenu(menu)
