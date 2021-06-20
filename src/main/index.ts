@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, MenuItem } from "electron"
+import { app, BrowserWindow, ipcMain, Menu } from "electron"
 import { NoteManager } from "./notes"
 import bunyan from "bunyan"
 import { menuTemplate, showSidebarItemMenu } from "./menus"
@@ -7,7 +7,7 @@ const log = bunyan.createLogger({ name: "main" })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any
-declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: unknown
 
 const noteManager = new NoteManager(app.getPath("userData"))
 
@@ -23,7 +23,7 @@ const createWindow = (): void => {
     height: 600,
     width: 800,
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY as string,
       contextIsolation: true,
       nodeIntegration: false,
     },
