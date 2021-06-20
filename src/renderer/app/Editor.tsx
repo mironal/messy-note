@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import "react-dom"
 import { useDebounce } from "react-use"
+import { Note } from "../..//types"
 import {
   onEditNoteText,
   readNoteText,

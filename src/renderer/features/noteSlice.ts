@@ -30,10 +30,13 @@ export const saveNoteText = createAsyncThunk<
   await window.notes.saveNote(note, noteText)
 })
 
-export const readNoteText = createAsyncThunk<string, Note>(
+export const readNoteText = createAsyncThunk<string | null, Note | null>(
   "note/readNoteText",
   async (note) => {
-    return await window.notes.readNote(note)
+    if (note) {
+      return await window.notes.readNote(note)
+    }
+    return null
   }
 )
 

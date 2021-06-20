@@ -36,13 +36,15 @@ const createWindow = (): void => {
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools()
-
   noteManager.on("change-notes", (notes) => {
     log.info(notes, "send change-notes event to main window")
     mainWindow.webContents.send("change-notes", notes)
   })
+
+  if (process.env.NODE_ENV === "development") {
+    // Open the DevTools.
+    mainWindow.webContents.openDevTools()
+  }
 }
 
 ipcMain.handle("create-note", () => {
@@ -74,11 +76,13 @@ app.on("ready", () => {
   noteManager.start()
 })
 
-app.whenReady().then(() => {
-  installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
-    .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log("An error occurred: ", err))
-})
+if (process.env.NODE_ENV === "development") {
+  app.whenReady().then(() => {
+    installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log("An error occurred: ", err))
+  })
+}
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
