@@ -17,7 +17,6 @@ declare global {
 }
 
 type Note = {
-  id: string
   name: string
   path: string
 }

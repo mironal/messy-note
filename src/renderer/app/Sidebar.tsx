@@ -11,7 +11,9 @@ export type SidebarProps = {
 export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
   const dispatch = useAppDispatch()
 
-  const currentNoteId = useAppSelector((state) => state.note.currentNote?.id)
+  const currentNotePath = useAppSelector(
+    (state) => state.note.currentNote?.path
+  )
   const notes = useAppSelector((state) => state.note.notes)
   return (
     <div className="Sidebar">
@@ -19,10 +21,10 @@ export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
       <ul>
         {notes.map((note) => (
           <NoteListItem
-            isSelected={note.id.includes(currentNoteId)}
+            isSelected={note.path == currentNotePath}
             note={note}
             key={note.path}
-            onClick={() => dispatch(onSelectNote(note.id))}
+            onClick={() => dispatch(onSelectNote(note.path))}
             onContextMenu={onContextMenu}
           />
         ))}

@@ -12,8 +12,8 @@ const initialState: NoteState = {
 }
 
 export const createNote = createAsyncThunk("note/create", async () => {
-  const id = await window.notes.createNote()
-  return id
+  const path = await window.notes.createNote()
+  return path
 })
 
 export const noteSlice = createSlice({
@@ -21,7 +21,7 @@ export const noteSlice = createSlice({
   initialState,
   reducers: {
     onSelectNote: (state, action: PayloadAction<string>) => {
-      state.currentNote = state.notes.find((n) => n.id == action.payload)
+      state.currentNote = state.notes.find((n) => n.path == action.payload)
     },
     onChangeNotes: (state, action: PayloadAction<Note[]>) => {
       state.notes = action.payload
@@ -35,7 +35,7 @@ export const noteSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(createNote.fulfilled, (state, action) => {
-      const note = state.notes.find((n) => n.id == action.payload)
+      const note = state.notes.find((n) => n.path == action.payload)
       state.currentNote = note
     })
   },

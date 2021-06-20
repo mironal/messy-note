@@ -2,7 +2,6 @@ import fs from "fs"
 import events from "events"
 import path from "path"
 import bunyan from "bunyan"
-import { v4 as uuidv4 } from "uuid"
 import { Note } from "../types"
 import chokidar from "chokidar"
 
@@ -44,16 +43,26 @@ export class NoteManager extends events.EventEmitter {
   }
 
   async createNewNote() {
-    const uuid = uuidv4()
-    const newNotePath =
-      path.join(this.notesDirPath, uuid) + "." + NoteManager.NOTE_EXTENSION
+    let index = 0
+
+    const name = "Untitled"
+    let newNotePath =
+      path.join(this.notesDirPath, name) + "." + NoteManager.NOTE_EXTENSION
+
+    while (fs.existsSync(newNotePath)) {
+      index += 1
+      newNotePath =
+        path.join(this.notesDirPath, `${name}_${index}`) +
+        "." +
+        NoteManager.NOTE_EXTENSION
+    }
 
     await fs.promises.writeFile(newNotePath, "", {
       encoding: "utf-8",
     })
 
     log.info(newNotePath, "created")
-    return uuid
+    return newNotePath
   }
 
   async readNoteText(note: Note): Promise<string> {
@@ -73,9 +82,8 @@ export class NoteManager extends events.EventEmitter {
     const notes = watchedFiles[this.notesDirPath]
     this.notes = notes.map((n) => {
       return {
-        id: path.basename(n, ".mnote"),
         path: path.join(this.notesDirPath, n),
-        name: n,
+        name: path.basename(n, `.${NoteManager.NOTE_EXTENSION}`),
       }
     })
 
