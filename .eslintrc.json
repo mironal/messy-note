@@ -14,7 +14,7 @@
   ],
   "parser": "@typescript-eslint/parser",
   "rules": {
-    "import/no-unresolved": 2,
+    "import/no-unresolved": 0,
     "@typescript-eslint/explicit-module-boundary-types": "off"
   }
 }

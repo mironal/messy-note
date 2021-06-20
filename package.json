@@ -53,8 +53,8 @@
               "config": "./webpack.renderer.config.js",
               "entryPoints": [
                 {
-                  "html": "./src/index.html",
-                  "js": "./src/renderer.tsx",
+                  "html": "./src/renderer/index.html",
+                  "js": "./src/renderer/renderer.tsx",
                   "name": "main_window",
                   "preload": {
                     "js": "./src/preload.ts"
@@ -85,6 +85,7 @@
     "chokidar": "3.5.2",
     "css-loader": "5.2.6",
     "electron": "13.1.2",
+    "electron-devtools-installer": "^3.2.0",
     "eslint": "7.29.0",
     "eslint-plugin-import": "2.23.4",
     "eslint-plugin-react": "7.24.0",
@@ -102,6 +103,8 @@
     "uuid": "8.3.2"
   },
   "dependencies": {
-    "electron-squirrel-startup": "1.0.0"
+    "@reduxjs/toolkit": "^1.6.0",
+    "electron-squirrel-startup": "1.0.0",
+    "react-redux": "^7.2.4"
   }
 }
