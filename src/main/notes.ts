@@ -1,4 +1,4 @@
-import fs, { FSWatcher, watchFile } from "fs"
+import fs from "fs"
 import events from "events"
 import path from "path"
 import bunyan from "bunyan"
@@ -118,7 +118,7 @@ export class NoteManager extends events.EventEmitter {
     this.watcher = chokidar.watch(
       this.notesDirPath + "/*." + NoteManager.NOTE_EXTENSION,
       {
-        ignored: /(^|[\/\\])\../, // ignore dotfiles
+        ignored: /(^|[/\\])\../, // ignore dotfiles
       }
     )
     this.watcher

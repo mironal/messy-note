@@ -1,5 +1,4 @@
 import { IpcRenderer } from "electron"
-
 declare global {
   interface Window {
     // for contextBridge in preload.ts
