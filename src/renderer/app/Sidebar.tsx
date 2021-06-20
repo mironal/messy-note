@@ -1,6 +1,6 @@
 import React from "react"
 import "react-dom"
-import { Note } from "./types"
+import { Note } from "../../types"
 
 export type SidebarProps = {
   notes: Note[]

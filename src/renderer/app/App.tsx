@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { hot } from "react-hot-loader"
 import { Editor } from "./Editor"
 import { Sidebar } from "./Sidebar"
-import { Note } from "./types"
+import { Note } from "../../types"
 import SplitPane from "react-split-pane"
 import { useLocalStorage } from "react-use"
 

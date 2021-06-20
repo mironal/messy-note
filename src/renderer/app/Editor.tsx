@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import "react-dom"
-import { Note } from "./types"
+import { Note } from "../../types"
 import { useDebounce } from "react-use"
 
 export type EditorProps = {
