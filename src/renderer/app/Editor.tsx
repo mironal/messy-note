@@ -1,52 +1,55 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import "react-dom"
 import { useDebounce } from "react-use"
-import { useAppSelector } from "../hooks"
+import {
+  onEditNoteText,
+  readNoteText,
+  saveNoteText,
+} from "../features/noteSlice"
+import { useAppDispatch, useAppSelector } from "../hooks"
 
 export const Editor = () => {
-  const [noteText, setNoteText] = useState<string | null>(null)
-  const [activateSave, setActivateSave] = useState(false)
+  const dispatch = useAppDispatch()
+  const note = useAppSelector(
+    (state) => state.note.currentNote,
+    (l, r) => l?.path === r?.path
+  )
+  const noteText = useAppSelector((state) => state.note.currentNoteText)
+  const savingState = useAppSelector((state) => state.note.savingState)
 
-  const note = useAppSelector((state) => state.note.currentNote)
-
-  const [isReady, cancelSaveNote] = useDebounce(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, cancelSaveNote] = useDebounce(
     () => {
-      if (noteText !== null && activateSave) {
-        window.notes.saveNote(note, noteText)
-        console.log("save note")
+      if (noteText !== null) {
+        dispatch(saveNoteText({ note, noteText }))
       }
     },
-    5000 /* ms */,
+    3000 /* ms */,
     [noteText]
   )
 
   useEffect(() => {
-    if (note) {
-      window.notes.readNote(note).then(setNoteText)
-    }
-    return () => {
-      cancelSaveNote()
-      setNoteText(null)
-      setActivateSave(false)
-    }
+    dispatch(readNoteText(note))
   }, [note])
 
   const onChangeText = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (noteText !== null) {
-      setNoteText(ev.target.value)
-      setActivateSave(true)
+      dispatch(onEditNoteText(ev.target.value))
     }
   }
 
   const SaveState = (() => {
-    const ready = isReady()
-    if (ready === true) {
-      return "Saved"
-    } else if (ready === false) {
-      return "Pending save..."
-    } else {
-      return ""
+    switch (savingState) {
+      case "idle":
+        return "変更なし"
+      case "no-change":
+        return "保存済"
+      case "modified":
+        return "保存待機中"
+      case "saving":
+        return "保存中"
     }
+    return savingState
   })()
 
   return (

@@ -1,7 +1,7 @@
 import React from "react"
 import "react-dom"
 import { Note } from "../../types"
-import { createNote, onSelectNote } from "../features/noteSlice"
+import { onChangeCurrentNote, createNote } from "../features/noteSlice"
 import { useAppDispatch, useAppSelector } from "../hooks"
 
 export type SidebarProps = {
@@ -24,7 +24,7 @@ export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
             isSelected={note.path == currentNotePath}
             note={note}
             key={note.path}
-            onClick={() => dispatch(onSelectNote(note.path))}
+            onClick={() => dispatch(onChangeCurrentNote(note.path))}
             onContextMenu={onContextMenu}
           />
         ))}
