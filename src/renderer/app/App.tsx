@@ -1,27 +1,24 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { hot } from "react-hot-loader"
 import { Editor } from "./Editor"
 import { Sidebar } from "./Sidebar"
-import { Note } from "../../types"
 import SplitPane from "react-split-pane"
-import { useLocalStorage } from "react-use"
+import { useEffectOnce, useLocalStorage } from "react-use"
+import { useAppDispatch } from "../hooks"
+import { onChangeNotes } from "../features/noteSlice"
 
 const App = () => {
-  const [notes, setNotes] = useState<Note[]>([])
-  const [selectingNote, setSelectingNote] = useState<Note | null>(null)
+  const dispatch = useAppDispatch()
 
-  useEffect(() => {
-    const off = window.notes.onChangeNotes(setNotes)
+  useEffectOnce(() => {
+    const off = window.notes.onChangeNotes((notes) =>
+      dispatch(onChangeNotes(notes))
+    )
+
+    // onChangeNotes を subscribe してから最初のイベントを発行する
     window.notes.reload()
     return off
-  }, [])
-
-  useEffect(() => {
-    // 選択している note がなくなった場合は selectingNote も null にする
-    if (selectingNote && !notes.some((n) => n.path == selectingNote.path)) {
-      setSelectingNote(null)
-    }
-  }, [notes])
+  })
 
   const [sidebarWidth, setSidebarWidth] = useLocalStorage("sidebar-width", 200)
 
@@ -33,14 +30,8 @@ const App = () => {
         size={sidebarWidth}
         onChange={setSidebarWidth}
       >
-        <Sidebar
-          notes={notes}
-          selectingNote={selectingNote}
-          onClickAddNote={window.notes.createNote}
-          onSelectNote={setSelectingNote}
-          onContextMenu={window.menu.showSidebarItemMenu}
-        />
-        <Editor note={selectingNote} />
+        <Sidebar onContextMenu={window.menu.showSidebarItemMenu} />
+        <Editor />
       </SplitPane>
     </div>
   )

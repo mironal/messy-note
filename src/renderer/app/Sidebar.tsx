@@ -1,32 +1,28 @@
 import React from "react"
 import "react-dom"
 import { Note } from "../../types"
+import { createNote, onSelectNote } from "../features/noteSlice"
+import { useAppDispatch, useAppSelector } from "../hooks"
 
 export type SidebarProps = {
-  notes: Note[]
-  selectingNote: Note | undefined
-  onClickAddNote: () => void
-  onSelectNote: (note: Note) => void
   onContextMenu?: (note: Note) => any
 }
 
-export const Sidebar = ({
-  notes,
-  selectingNote,
-  onClickAddNote,
-  onSelectNote,
-  onContextMenu,
-}: SidebarProps): JSX.Element => {
+export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
+  const dispatch = useAppDispatch()
+
+  const currentNoteId = useAppSelector((state) => state.note.currentNote?.id)
+  const notes = useAppSelector((state) => state.note.notes)
   return (
     <div className="Sidebar">
-      <button onClick={onClickAddNote}>Add note</button>
+      <button onClick={() => dispatch(createNote())}>Add note</button>
       <ul>
         {notes.map((note) => (
           <NoteListItem
-            isSelected={note.path == selectingNote?.path}
+            isSelected={note.id.includes(currentNoteId)}
             note={note}
             key={note.path}
-            onClick={onSelectNote}
+            onClick={() => dispatch(onSelectNote(note.id))}
             onContextMenu={onContextMenu}
           />
         ))}

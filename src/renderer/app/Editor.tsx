@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react"
 import "react-dom"
-import { Note } from "../../types"
 import { useDebounce } from "react-use"
+import { useAppSelector } from "../hooks"
 
-export type EditorProps = {
-  note: Note | null
-}
-
-export const Editor = ({ note }: EditorProps) => {
+export const Editor = () => {
   const [noteText, setNoteText] = useState<string | null>(null)
   const [activateSave, setActivateSave] = useState(false)
+
+  const note = useAppSelector((state) => state.note.currentNote)
 
   const [isReady, cancelSaveNote] = useDebounce(
     () => {

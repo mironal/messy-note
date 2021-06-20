@@ -3,7 +3,7 @@ declare global {
   interface Window {
     // for contextBridge in preload.ts
     notes: {
-      createNote: () => Promise<void>
+      createNote: () => Promise<string>
       reload: () => Promise<void>
       onChangeNotes: (listener: (filenames: Note[]) => void) => () => void
       saveNote: (note: Note, noteText: string) => Promise<void>
@@ -17,6 +17,7 @@ declare global {
 }
 
 type Note = {
+  id: string
   name: string
   path: string
 }

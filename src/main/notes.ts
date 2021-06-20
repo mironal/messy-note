@@ -53,6 +53,7 @@ export class NoteManager extends events.EventEmitter {
     })
 
     log.info(newNotePath, "created")
+    return uuid
   }
 
   async readNoteText(note: Note): Promise<string> {
@@ -72,6 +73,7 @@ export class NoteManager extends events.EventEmitter {
     const notes = watchedFiles[this.notesDirPath]
     this.notes = notes.map((n) => {
       return {
+        id: path.basename(n, ".mnote"),
         path: path.join(this.notesDirPath, n),
         name: n,
       }

@@ -1,4 +1,8 @@
 import { app, BrowserWindow, ipcMain, Menu } from "electron"
+import installExtension, {
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from "electron-devtools-installer"
 import { NoteManager } from "./notes"
 import bunyan from "bunyan"
 import { menuTemplate, showSidebarItemMenu } from "./menus"
@@ -43,7 +47,7 @@ const createWindow = (): void => {
 
 ipcMain.handle("create-note", () => {
   log.info("handle create-notes")
-  noteManager.createNewNote()
+  return noteManager.createNewNote()
 })
 
 ipcMain.handle("reload-note", () => {
@@ -68,6 +72,12 @@ app.on("ready", createWindow)
 
 app.on("ready", () => {
   noteManager.start()
+})
+
+app.whenReady().then(() => {
+  installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log("An error occurred: ", err))
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
