@@ -65,6 +65,10 @@ ipcMain.handle("save-note", (ev, note, noteText) => {
   return noteManager.saveNote(note, noteText)
 })
 
+ipcMain.handle("rename-note", (ev, note, newName) => {
+  return noteManager.renameNote(note, newName)
+})
+
 ipcMain.on("show-sidebar-item-menu", showSidebarItemMenu(noteManager))
 
 // This method will be called when Electron has finished

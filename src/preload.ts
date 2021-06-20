@@ -15,6 +15,9 @@ contextBridge.exposeInMainWorld("notes", {
     ipcRenderer.invoke("save-note", note, noteText),
   readNote: (note: Note): Promise<string> =>
     ipcRenderer.invoke("read-note", note),
+
+  renameNote: (note: Note, newName: string): Promise<Note> =>
+    ipcRenderer.invoke("rename-note", note, newName),
 })
 
 contextBridge.exposeInMainWorld("menu", {

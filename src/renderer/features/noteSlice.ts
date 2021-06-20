@@ -63,6 +63,17 @@ export const onChangeCurrentNote = createAsyncThunk<string, string>(
   }
 )
 
+export const renameNote = createAsyncThunk(
+  "note/renameNote",
+  async (name: string, { getState }) => {
+    const {
+      note: { currentNote: note },
+    } = getState() as RootState
+
+    return await window.notes.renameNote(note, name)
+  }
+)
+
 export const noteSlice = createSlice({
   name: "note",
   initialState,
@@ -103,6 +114,10 @@ export const noteSlice = createSlice({
     })
     builder.addCase(readNoteText.fulfilled, (state, action) => {
       state.currentNoteText = action.payload
+    })
+
+    builder.addCase(renameNote.fulfilled, (state, action) => {
+      state.currentNote = action.payload
     })
   },
 })

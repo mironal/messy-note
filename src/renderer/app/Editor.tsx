@@ -1,13 +1,40 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import "react-dom"
 import { useDebounce } from "react-use"
 
 import {
   onEditNoteText,
   readNoteText,
+  renameNote,
   saveNoteText,
 } from "../features/noteSlice"
 import { useAppDispatch, useAppSelector } from "../hooks"
+
+type TitleEditingFormProps = {
+  onClickSave: (title: string) => void
+  onClickCancel: () => void
+  title: string
+}
+const TitleEditingForm: React.VFC<TitleEditingFormProps> = ({
+  title,
+  onClickSave,
+  onClickCancel,
+}: TitleEditingFormProps) => {
+  const [newTitle, setTitle] = useState(title)
+  return (
+    <div>
+      <input
+        type="text"
+        name="title"
+        id="title"
+        value={newTitle}
+        onChange={(ev) => setTitle(ev.target.value)}
+      />
+      <button onClick={() => onClickSave(newTitle)}>Save</button>
+      <button onClick={() => onClickCancel()}>Cancel</button>
+    </div>
+  )
+}
 
 export const Editor = () => {
   const dispatch = useAppDispatch()
@@ -17,6 +44,8 @@ export const Editor = () => {
   )
   const noteText = useAppSelector((state) => state.note.currentNoteText)
   const savingState = useAppSelector((state) => state.note.savingState)
+
+  const [editingTitle, setEditingTitle] = useState(false)
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, cancelSaveNote] = useDebounce(
@@ -39,6 +68,10 @@ export const Editor = () => {
     }
   }
 
+  const onClickTitle = () => {
+    setEditingTitle(!editingTitle)
+  }
+
   const SaveState = (() => {
     switch (savingState) {
       case "idle":
@@ -50,14 +83,33 @@ export const Editor = () => {
       case "saving":
         return "保存中"
     }
-    return savingState
+  })()
+
+  const Title = (() => {
+    if (editingTitle) {
+      return (
+        <TitleEditingForm
+          title={note?.name}
+          onClickSave={(name) =>
+            dispatch(renameNote(name)).then(() => setEditingTitle(false))
+          }
+          onClickCancel={() => setEditingTitle(false)}
+        />
+      )
+    } else {
+      console.log("note", note)
+      const name = note?.name ?? "Undefined note"
+      return (
+        <h2 onClick={onClickTitle}>
+          {name} : {SaveState}
+        </h2>
+      )
+    }
   })()
 
   return (
     <div className="Editor">
-      <h2>
-        {note ? note.name : "undefined"}: {SaveState}
-      </h2>
+      {Title}
       {noteText !== null && (
         <textarea value={noteText} onChange={onChangeText} />
       )}

@@ -77,6 +77,23 @@ export class NoteManager extends events.EventEmitter {
     return fs.promises.unlink(path)
   }
 
+  async renameNote(note: Note, name: string): Promise<Note> {
+    const filename = (() => {
+      if (name.endsWith(NoteManager.NOTE_EXTENSION)) {
+        return name
+      }
+      return `${name}.${NoteManager.NOTE_EXTENSION}`
+    })()
+    const newPath = path.join(note.path, "..", filename)
+
+    await fs.promises.rename(note.path, newPath)
+    return {
+      ...note,
+      name,
+      path: newPath,
+    }
+  }
+
   private async emitNotes(event: string) {
     const watchedFiles = this.watcher.getWatched()
     const notes = watchedFiles[this.notesDirPath]
