@@ -39,7 +39,7 @@ export class NoteManager extends events.EventEmitter {
   }
 
   async reload() {
-    this.emitNotes()
+    this.emitNotes("reload")
   }
 
   async createNewNote() {
@@ -77,7 +77,7 @@ export class NoteManager extends events.EventEmitter {
     return fs.promises.unlink(path)
   }
 
-  private async emitNotes() {
+  private async emitNotes(event: string) {
     const watchedFiles = this.watcher.getWatched()
     const notes = watchedFiles[this.notesDirPath]
     this.notes = notes.map((n) => {
@@ -87,6 +87,7 @@ export class NoteManager extends events.EventEmitter {
       }
     })
 
+    log.info(this.notes, `change-notes[${event}]`)
     this.emit("change-notes", this.notes)
   }
 
@@ -129,13 +130,14 @@ export class NoteManager extends events.EventEmitter {
       this.notesDirPath + "/*." + NoteManager.NOTE_EXTENSION,
       {
         ignored: /(^|[/\\])\../, // ignore dotfiles
+        ignoreInitial: true,
       }
     )
     this.watcher
-      .on("ready", () => this.emitNotes())
-      .on("change", () => this.emitNotes())
-      .on("add", () => this.emitNotes())
-      .on("unlink", () => this.emitNotes())
+      .on("ready", () => this.emitNotes("ready"))
+      .on("change", () => this.emitNotes("change"))
+      .on("add", () => this.emitNotes("add"))
+      .on("unlink", () => this.emitNotes("unlink"))
       .on("error", log.error)
   }
 }

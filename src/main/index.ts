@@ -37,7 +37,7 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
   noteManager.on("change-notes", (notes) => {
-    log.info(notes, "send change-notes event to main window")
+    log.info("on.change-note")
     mainWindow.webContents.send("change-notes", notes)
   })
 
@@ -73,6 +73,7 @@ ipcMain.on("show-sidebar-item-menu", showSidebarItemMenu(noteManager))
 app.on("ready", createWindow)
 
 app.on("ready", () => {
+  log.info("app.ready")
   noteManager.start()
 })
 
