@@ -6,9 +6,9 @@ declare global {
       createNote: () => Promise<string>
       reload: () => Promise<void>
       onChangeNotes: (listener: (filenames: Note[]) => void) => () => void
-      saveNote: (note: Note, noteText: string) => Promise<void>
-      readNote: (note: Note) => Promise<string>
-      renameNote: (note: Note, newName: string) => Promise<Note>
+      saveNote: (notePath: string, noteText: string) => Promise<void>
+      readNote: (notePath: string) => Promise<string>
+      renameNote: (notePath: string, newName: string) => Promise<Note>
     }
 
     menu: {

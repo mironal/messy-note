@@ -57,16 +57,25 @@ ipcMain.handle("reload-note", () => {
   noteManager.reload()
 })
 
-ipcMain.handle("read-note", (ev, note) => {
-  return noteManager.readNoteText(note)
+ipcMain.handle("read-note", (ev, notePath) => {
+  if (isString(notePath)) {
+    return noteManager.readNoteText(notePath)
+  }
+  return Promise.reject("argument is not string")
 })
 
-ipcMain.handle("save-note", (ev, note, noteText) => {
-  return noteManager.saveNote(note, noteText)
+ipcMain.handle("save-note", (ev, notePath, noteText) => {
+  if (isString(notePath) && isString(noteText)) {
+    return noteManager.saveNote(notePath, noteText)
+  }
+  return Promise.reject("argument is not string")
 })
 
-ipcMain.handle("rename-note", (ev, note, newName) => {
-  return noteManager.renameNote(note, newName)
+ipcMain.handle("rename-note", (ev, notePath, newName) => {
+  if (isString(notePath) && isString(newName)) {
+    return noteManager.renameNote(notePath, newName)
+  }
+  return Promise.reject("argument is not string")
 })
 
 ipcMain.on("show-sidebar-item-menu", showSidebarItemMenu(noteManager))
@@ -110,3 +119,9 @@ app.on("activate", () => {
 // code. You can also put them in separate files and import them here.
 const menu = Menu.buildFromTemplate(menuTemplate)
 Menu.setApplicationMenu(menu)
+
+// utils
+
+function isString(arg: unknown): arg is string {
+  return typeof arg === "string"
+}

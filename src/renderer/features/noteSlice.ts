@@ -27,14 +27,14 @@ export const saveNoteText = createAsyncThunk<
   void,
   { note: Note; noteText: string }
 >("note/saveNoteText", async ({ note, noteText }) => {
-  await window.notes.saveNote(note, noteText)
+  await window.notes.saveNote(note.path, noteText)
 })
 
 export const readNoteText = createAsyncThunk<string | null, Note | null>(
   "note/readNoteText",
   async (note) => {
     if (note) {
-      return await window.notes.readNote(note)
+      return await window.notes.readNote(note.path)
     }
     return null
   }
@@ -70,7 +70,7 @@ export const renameNote = createAsyncThunk(
       note: { currentNote: note },
     } = getState() as RootState
 
-    return await window.notes.renameNote(note, name)
+    return await window.notes.renameNote(note.path, name)
   }
 )
 

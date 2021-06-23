@@ -11,13 +11,13 @@ contextBridge.exposeInMainWorld("notes", {
       ipcRenderer.removeListener("change-notes", listener)
     }
   },
-  saveNote: (note: Note, noteText: string): Promise<void> =>
-    ipcRenderer.invoke("save-note", note, noteText),
-  readNote: (note: Note): Promise<string> =>
-    ipcRenderer.invoke("read-note", note),
+  saveNote: (notePath: string, noteText: string): Promise<void> =>
+    ipcRenderer.invoke("save-note", notePath, noteText),
+  readNote: (notePath: string): Promise<string> =>
+    ipcRenderer.invoke("read-note", notePath),
 
-  renameNote: (note: Note, newName: string): Promise<Note> =>
-    ipcRenderer.invoke("rename-note", note, newName),
+  renameNote: (notePath: string, newName: string): Promise<Note> =>
+    ipcRenderer.invoke("rename-note", notePath, newName),
 })
 
 contextBridge.exposeInMainWorld("menu", {

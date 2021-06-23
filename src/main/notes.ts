@@ -65,30 +65,29 @@ export class NoteManager extends events.EventEmitter {
     return newNotePath
   }
 
-  async readNoteText(note: Note): Promise<string> {
-    return fs.promises.readFile(note.path, "utf-8")
+  async readNoteText(notePath: string): Promise<string> {
+    return fs.promises.readFile(notePath, "utf-8")
   }
 
-  async saveNote(note: Note, noteText: string): Promise<void> {
-    return fs.promises.writeFile(note.path, noteText, "utf-8")
+  async saveNote(notePath: string, noteText: string): Promise<void> {
+    return fs.promises.writeFile(notePath, noteText, "utf-8")
   }
 
-  async deleteNote({ path }: Note): Promise<void> {
-    return fs.promises.unlink(path)
+  async deleteNote(notePath: string): Promise<void> {
+    return fs.promises.unlink(notePath)
   }
 
-  async renameNote(note: Note, name: string): Promise<Note> {
+  async renameNote(notePath: string, name: string): Promise<Note> {
     const filename = (() => {
       if (name.endsWith(NoteManager.NOTE_EXTENSION)) {
         return name
       }
       return `${name}.${NoteManager.NOTE_EXTENSION}`
     })()
-    const newPath = path.join(note.path, "..", filename)
+    const newPath = path.join(notePath, "..", filename)
 
-    await fs.promises.rename(note.path, newPath)
+    await fs.promises.rename(notePath, newPath)
     return {
-      ...note,
       name,
       path: newPath,
     }

@@ -13,12 +13,16 @@ export function showSidebarItemMenu(noteManager: NoteManager) {
             type: "warning",
             title: `Are you sure you want to delete '${note.name}'?`,
             message: "You can't restore this note.",
+            detail:
+              process.platform === "darwin"
+                ? `Are you sure you want to delete '${note.name}'?`
+                : null, // for mac
             buttons: ["Delete", "Cancel"],
             defaultId: 0,
           })
 
           if (response === 0) {
-            noteManager.deleteNote(note)
+            noteManager.deleteNote(note.path)
           }
         },
       })
