@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "react-dom"
 import { useDebounce } from "react-use"
+import { Box, makeStyles } from "@material-ui/core"
 
 import {
   onEditNoteText,
@@ -36,7 +37,15 @@ const TitleEditingForm: React.VFC<TitleEditingFormProps> = ({
   )
 }
 
+const useStyles = makeStyles({
+  textare: {
+    width: "100%",
+    height: "100%",
+  },
+})
+
 export const Editor = () => {
+  const classes = useStyles()
   const dispatch = useAppDispatch()
   const note = useAppSelector(
     (state) => state.note.currentNote,
@@ -77,7 +86,7 @@ export const Editor = () => {
       case "idle":
         return "変更なし"
       case "no-change":
-        return "保存済"
+        return "保存しました"
       case "modified":
         return "保存待機中"
       case "saving":
@@ -97,7 +106,6 @@ export const Editor = () => {
         />
       )
     } else {
-      console.log("note", note)
       const name = note?.name ?? "Undefined note"
       return (
         <h2 onClick={onClickTitle}>
@@ -108,11 +116,15 @@ export const Editor = () => {
   })()
 
   return (
-    <div className="Editor">
+    <Box height="1" width="1" className="EditorContainer">
       {Title}
       {noteText !== null && (
-        <textarea value={noteText} onChange={onChangeText} />
+        <textarea
+          className={classes.textare}
+          value={noteText}
+          onChange={onChangeText}
+        />
       )}
-    </div>
+    </Box>
   )
 }

@@ -4,12 +4,29 @@ import { shallowEqual } from "react-redux"
 import { Note } from "../../types"
 import { onChangeCurrentNote, createNote } from "../features/noteSlice"
 import { useAppDispatch, useAppSelector } from "../hooks"
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  Fab,
+  makeStyles,
+} from "@material-ui/core"
+import { Add as AddIcon } from "@material-ui/icons"
+
+const useStyles = makeStyles((theme) => ({
+  addButton: {
+    marginTop: theme.spacing(1),
+    marginLeft: theme.spacing(1),
+  },
+}))
 
 export type SidebarProps = {
   onContextMenu?: (note: Note) => any
 }
 
 export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
+  const classes = useStyles()
   const dispatch = useAppDispatch()
 
   const currentNotePath = useAppSelector(
@@ -24,39 +41,52 @@ export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
   )
 
   return (
-    <div className="Sidebar">
-      <button onClick={() => dispatch(createNote())}>Add note</button>
-      <ul>
+    <Box className="Sidebar">
+      <List dense={true}>
         {notes.map((note) => (
-          <MemoNoteListItem
-            isSelected={note.path == currentNotePath}
+          <NoteListItem
+            selected={note.path == currentNotePath}
             note={note}
             key={note.path}
             onClick={() => onClickItem(note)}
             onContextMenu={onContextMenu}
           />
         ))}
-      </ul>
-    </div>
+      </List>
+      <Box>
+        <Fab
+          className={classes.addButton}
+          size="small"
+          aria-label="add"
+          onClick={() => dispatch(createNote())}
+        >
+          <AddIcon />
+        </Fab>
+      </Box>
+    </Box>
   )
 }
 
 type NoteListItemProps = {
-  isSelected: boolean
+  selected: boolean
   note: Note
   onClick: (note: Note) => any
   onContextMenu?: (note: Note) => any
 }
-const NoteListItem = ({ note, onClick, onContextMenu }: NoteListItemProps) => {
+const NoteListItem = ({
+  note,
+  onClick,
+  onContextMenu,
+  selected,
+}: NoteListItemProps) => {
   return (
-    <li
+    <ListItem
       className="NoteListItem"
       onClick={() => onClick(note)}
       onContextMenu={() => onContextMenu && onContextMenu(note)}
+      selected={selected}
     >
-      <p>{note.name}</p>
-    </li>
+      <ListItemText primary={note.name} />
+    </ListItem>
   )
 }
-
-const MemoNoteListItem = React.memo(NoteListItem)

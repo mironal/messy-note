@@ -6,6 +6,7 @@ import SplitPane from "react-split-pane"
 import { useEffectOnce, useLocalStorage } from "react-use"
 import { useAppDispatch } from "../hooks"
 import { onChangeNotes } from "../features/noteSlice"
+import { Container } from "@material-ui/core"
 
 const App = () => {
   const dispatch = useAppDispatch()
@@ -23,7 +24,7 @@ const App = () => {
   const [sidebarWidth, setSidebarWidth] = useLocalStorage("sidebar-width", 200)
 
   return (
-    <div className="Container">
+    <Container className="Container">
       <SplitPane
         split="vertical"
         minSize={100}
@@ -33,7 +34,7 @@ const App = () => {
         <Sidebar onContextMenu={window.menu.showSidebarItemMenu} />
         <Editor />
       </SplitPane>
-    </div>
+    </Container>
   )
 }
 
