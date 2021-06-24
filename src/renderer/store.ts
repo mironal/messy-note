@@ -5,6 +5,7 @@ export const store = configureStore({
   reducer: {
     note: noteReducer,
   },
+  devTools: true,
 })
 
 export type RootState = ReturnType<typeof store.getState>

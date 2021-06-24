@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import "react-dom"
 import { Note } from "../../types"
 import { notesSelector, selectNote } from "../features/noteSlice"
@@ -14,6 +14,7 @@ import {
 import { Add as AddIcon } from "@material-ui/icons"
 import { createNote } from "../features/actions"
 import { shallowEqual } from "react-redux"
+import { unwrapResult } from "@reduxjs/toolkit"
 
 const useStyles = makeStyles((theme) => ({
   addButton: {
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export type SidebarProps = {
-  onContextMenu?: (note: Note) => any
+  onContextMenu?: (note: Note) => void
 }
 
 export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
@@ -50,7 +51,11 @@ export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
           className={classes.addButton}
           size="small"
           aria-label="add"
-          onClick={() => dispatch(createNote())}
+          onClick={() =>
+            dispatch(createNote())
+              .then(unwrapResult)
+              .then((path) => dispatch(selectNote(path)))
+          }
         >
           <AddIcon />
         </Fab>
@@ -61,7 +66,7 @@ export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
 
 type NoteListItemProps = {
   notePath: string
-  onContextMenu?: (note: Note) => any
+  onContextMenu?: (note: Note) => void
 }
 const NoteListItem = ({ onContextMenu, notePath }: NoteListItemProps) => {
   const note = useAppSelector((state) =>
@@ -73,7 +78,10 @@ const NoteListItem = ({ onContextMenu, notePath }: NoteListItemProps) => {
     <ListItem
       className="NoteListItem"
       onClick={() => dispatch(selectNote(note.path))}
-      onContextMenu={() => onContextMenu && onContextMenu(note)}
+      onContextMenu={useCallback(() => {
+        dispatch(selectNote(note.path))
+        onContextMenu && onContextMenu(note)
+      }, [dispatch])}
       selected={note.path === currentNotePath}
     >
       <ListItemText primary={note.name} />

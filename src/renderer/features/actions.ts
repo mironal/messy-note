@@ -1,6 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { Note } from "../../types"
-import { RootState } from "../store"
 
 export const createNote = createAsyncThunk("note/createNote", async () => {
   const path = await window.notes.createNote()
