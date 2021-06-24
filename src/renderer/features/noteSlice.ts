@@ -1,127 +1,40 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
+import {
+  createEntityAdapter,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit"
 import { Note } from "../../types"
 import { RootState } from "../store"
 
-type NoteSavingState = "saving" | "no-change" | "modified" | "idle"
-
-type NoteState = {
-  savingState: NoteSavingState
-  currentNoteText: string | null
-  currentNote: Note | null
-  notes: Note[]
-}
-
-const initialState: NoteState = {
-  savingState: "idle",
-  currentNoteText: null,
-  currentNote: null,
-  notes: [],
-}
-
-export const createNote = createAsyncThunk("note/createNote", async () => {
-  const path = await window.notes.createNote()
-  return path
+const noteAdapter = createEntityAdapter<Note>({
+  selectId: (note) => note.path,
 })
-
-export const saveNoteText = createAsyncThunk<
-  void,
-  { note: Note; noteText: string }
->("note/saveNoteText", async ({ note, noteText }) => {
-  await window.notes.saveNote(note.path, noteText)
-})
-
-export const readNoteText = createAsyncThunk<string | null, Note | null>(
-  "note/readNoteText",
-  async (note) => {
-    if (note) {
-      return await window.notes.readNote(note.path)
-    }
-    return null
-  }
-)
-
-export const onChangeCurrentNote = createAsyncThunk<string, string>(
-  "note/changeCurrentNote",
-  async (path, { getState, dispatch }) => {
-    const {
-      note: { currentNote: note, currentNoteText: noteText, savingState },
-    } = getState() as RootState
-
-    if (savingState === "modified" && note && noteText) {
-      await dispatch(saveNoteText({ note, noteText }))
-    }
-
-    return path
-  },
-  {
-    condition: (path, { getState }) => {
-      const {
-        note: { currentNote },
-      } = getState() as RootState
-      return currentNote.path !== path
-    },
-  }
-)
-
-export const renameNote = createAsyncThunk(
-  "note/renameNote",
-  async (name: string, { getState }) => {
-    const {
-      note: { currentNote: note },
-    } = getState() as RootState
-
-    return await window.notes.renameNote(note.path, name)
-  }
-)
 
 export const noteSlice = createSlice({
   name: "note",
-  initialState,
+  initialState: noteAdapter.getInitialState({
+    loading: true,
+    selected: null as Note["path"] | null,
+  }),
   reducers: {
-    onEditNoteText: (state, action: PayloadAction<string>) => {
-      if (state.currentNote && state.savingState !== "saving") {
-        state.savingState = "modified"
-        state.currentNoteText = action.payload
-      }
-    },
     onChangeNotes: (state, action: PayloadAction<Note[]>) => {
-      state.notes = action.payload
-
-      if (!state.currentNote && action.payload.length > 0) {
-        state.currentNote = action.payload[0]
-      } else if (action.payload.length == 0) {
-        state.currentNote = null
-        state.currentNoteText = null
-        state.savingState = "idle"
+      noteAdapter.setAll(state, action.payload)
+      state.loading = false
+      if (!state.selected && action.payload.length > 0) {
+        state.selected = action.payload[0].path
       }
     },
+    selectNote: (state, action: PayloadAction<string>) => {
+      state.selected = action.payload
+    },
   },
-  extraReducers: (builder) => {
-    builder.addCase(createNote.fulfilled, (state, action) => {
-      const note = state.notes.find((n) => n.path == action.payload)
-      state.currentNote = note
-    })
-    builder.addCase(saveNoteText.pending, (state, action) => {
-      state.savingState = "saving"
-    })
-    builder.addCase(saveNoteText.fulfilled, (state, action) => {
-      state.savingState = "no-change"
-    })
-    builder.addCase(onChangeCurrentNote.fulfilled, (state, action) => {
-      state.currentNote = state.notes.find((n) => n.path == action.payload)
-      state.currentNoteText = null
-      state.savingState = "idle"
-    })
-    builder.addCase(readNoteText.fulfilled, (state, action) => {
-      state.currentNoteText = action.payload
-    })
-
-    builder.addCase(renameNote.fulfilled, (state, action) => {
-      state.currentNote = action.payload
-    })
-  },
+  //extraReducers: (builder) => {},
 })
 
-export const { onChangeNotes, onEditNoteText } = noteSlice.actions
+export const { onChangeNotes, selectNote } = noteSlice.actions
 
 export default noteSlice.reducer
+
+export const notesSelector = noteAdapter.getSelectors<RootState>(
+  (state) => state.note
+)

@@ -1,8 +1,7 @@
-import React, { useCallback } from "react"
+import React from "react"
 import "react-dom"
-import { shallowEqual } from "react-redux"
 import { Note } from "../../types"
-import { onChangeCurrentNote, createNote } from "../features/noteSlice"
+import { notesSelector, selectNote } from "../features/noteSlice"
 import { useAppDispatch, useAppSelector } from "../hooks"
 import {
   Box,
@@ -13,6 +12,8 @@ import {
   makeStyles,
 } from "@material-ui/core"
 import { Add as AddIcon } from "@material-ui/icons"
+import { createNote } from "../features/actions"
+import { shallowEqual } from "react-redux"
 
 const useStyles = makeStyles((theme) => ({
   addButton: {
@@ -29,26 +30,17 @@ export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const currentNotePath = useAppSelector(
-    (state) => state.note.currentNote?.path,
+  const notePaths = useAppSelector(
+    notesSelector.selectIds,
     shallowEqual
-  )
-  const notes = useAppSelector((state) => state.note.notes, shallowEqual)
-
-  const onClickItem = useCallback(
-    (note: Note) => dispatch(onChangeCurrentNote(note.path)),
-    [dispatch]
-  )
-
+  ) as string[]
   return (
     <Box className="Sidebar">
       <List dense={true}>
-        {notes.map((note) => (
+        {notePaths.map((notePath) => (
           <NoteListItem
-            selected={note.path == currentNotePath}
-            note={note}
-            key={note.path}
-            onClick={() => onClickItem(note)}
+            notePath={notePath}
+            key={notePath}
             onContextMenu={onContextMenu}
           />
         ))}
@@ -68,23 +60,21 @@ export const Sidebar = ({ onContextMenu }: SidebarProps): JSX.Element => {
 }
 
 type NoteListItemProps = {
-  selected: boolean
-  note: Note
-  onClick: (note: Note) => any
+  notePath: string
   onContextMenu?: (note: Note) => any
 }
-const NoteListItem = ({
-  note,
-  onClick,
-  onContextMenu,
-  selected,
-}: NoteListItemProps) => {
+const NoteListItem = ({ onContextMenu, notePath }: NoteListItemProps) => {
+  const note = useAppSelector((state) =>
+    notesSelector.selectById(state, notePath)
+  )
+  const currentNotePath = useAppSelector((state) => state.note.selected)
+  const dispatch = useAppDispatch()
   return (
     <ListItem
       className="NoteListItem"
-      onClick={() => onClick(note)}
+      onClick={() => dispatch(selectNote(note.path))}
       onContextMenu={() => onContextMenu && onContextMenu(note)}
-      selected={selected}
+      selected={note.path === currentNotePath}
     >
       <ListItemText primary={note.name} />
     </ListItem>
