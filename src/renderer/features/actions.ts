@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { Note } from "../../types"
+import { RootState } from "../store"
 
 export const createNote = createAsyncThunk("note/createNote", async () => {
   const path = await window.notes.createNote()
@@ -8,15 +8,37 @@ export const createNote = createAsyncThunk("note/createNote", async () => {
 
 export const saveNoteText = createAsyncThunk<
   void,
-  { note: Note; noteText: string }
->("note/saveNoteText", async ({ note, noteText }) => {
-  await window.notes.saveNote(note.path, noteText)
+  { notePath: string; noteText: string }
+>("note/saveNoteText", async ({ notePath, noteText }) => {
+  await window.notes.saveNote(notePath, noteText)
 })
 
-export const readNoteText = createAsyncThunk<string | null, Note | null>(
+export const readNoteText = createAsyncThunk<string | null, string | null>(
   "note/readNoteText",
-  async (note) => {
-    return await window.notes.readNote(note.path)
+  async (notePath) => {
+    return await window.notes.readNote(notePath)
+  }
+)
+
+export const saveCurrentEditingNote = createAsyncThunk(
+  "note/saveCurrentEditingNote",
+  async (args, { getState, dispatch }) => {
+    const {
+      editor: { editingText },
+      note: { selected },
+    } = getState() as RootState
+
+    await dispatch(saveNoteText({ notePath: selected, noteText: editingText }))
+  },
+  {
+    condition: (arg, { getState }) => {
+      const {
+        editor: { editingState },
+        note: { selected },
+      } = getState() as RootState
+
+      return selected && editingState === "modified"
+    },
   }
 )
 

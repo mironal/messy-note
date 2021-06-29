@@ -12,7 +12,7 @@ import {
   makeStyles,
 } from "@material-ui/core"
 import { Add as AddIcon } from "@material-ui/icons"
-import { createNote } from "../features/actions"
+import { createNote, saveCurrentEditingNote } from "../features/actions"
 import { shallowEqual } from "react-redux"
 import { unwrapResult } from "@reduxjs/toolkit"
 
@@ -74,10 +74,17 @@ const NoteListItem = ({ onContextMenu, notePath }: NoteListItemProps) => {
   )
   const currentNotePath = useAppSelector((state) => state.note.selected)
   const dispatch = useAppDispatch()
+
+  // 現在保存中のを保存してから選択する
+  const onClickNote = (notePath: string) => () =>
+    dispatch(saveCurrentEditingNote()).then(() =>
+      dispatch(selectNote(notePath))
+    )
+
   return (
     <ListItem
       className="NoteListItem"
-      onClick={() => dispatch(selectNote(note.path))}
+      onClick={onClickNote(note.path)}
       onContextMenu={useCallback(() => {
         dispatch(selectNote(note.path))
         onContextMenu && onContextMenu(note)
