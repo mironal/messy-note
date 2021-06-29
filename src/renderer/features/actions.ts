@@ -66,15 +66,17 @@ export const onChangeCurrentNote = createAsyncThunk<string, string>(
   }
 )*/
 
-/*
 export const renameNote = createAsyncThunk(
   "note/renameNote",
   async (name: string, { getState }) => {
     const {
-      note: { currentNote: note },
+      note: { selected },
     } = getState() as RootState
 
-    return await window.notes.renameNote(note.path, name)
+    const note = await window.notes.renameNote(selected, name)
+    return {
+      oldPath: selected,
+      newPath: note.path,
+    }
   }
 )
-*/

@@ -5,6 +5,7 @@ import {
 } from "@reduxjs/toolkit"
 import { Note } from "../../types"
 import { RootState } from "../store"
+import { renameNote } from "./actions"
 
 const noteAdapter = createEntityAdapter<Note>({
   selectId: (note) => note.path,
@@ -28,7 +29,14 @@ export const noteSlice = createSlice({
       state.selected = action.payload
     },
   },
-  //extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    builder.addCase(renameNote.fulfilled, (state, action) => {
+      // 選択中のノートが rename されたら再選択
+      if (state.selected === action.payload.oldPath) {
+        state.selected = action.payload.newPath
+      }
+    })
+  },
 })
 
 export const { onChangeNotes, selectNote } = noteSlice.actions

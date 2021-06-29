@@ -5,7 +5,7 @@ import { Box, makeStyles } from "@material-ui/core"
 
 import { notesSelector } from "../features/noteSlice"
 import { useAppDispatch, useAppSelector } from "../hooks"
-import { readNoteText, saveNoteText } from "../features/actions"
+import { readNoteText, renameNote, saveNoteText } from "../features/actions"
 import { editNoteText } from "../features/editorSlice"
 
 type TitleEditingFormProps = {
@@ -86,6 +86,13 @@ export const Editor = () => {
     [dispatch, noteText]
   )
 
+  const onBlurEditor = () => {
+    cancelSaveNote()
+    if (noteText !== null && savingState === "modified") {
+      dispatch(saveNoteText({ notePath, noteText }))
+    }
+  }
+
   const onClickTitle = useCallback(() => {
     setEditingTitle(!editingTitle)
   }, [dispatch, editingTitle])
@@ -111,7 +118,7 @@ export const Editor = () => {
         <TitleEditingForm
           title={noteName}
           onClickSave={(name) => {
-            // dispatch(renameNote(name)).then(() => setEditingTitle(false))
+            dispatch(renameNote(name)).then(() => setEditingTitle(false))
           }}
           onClickCancel={() => setEditingTitle(false)}
         />
@@ -134,6 +141,7 @@ export const Editor = () => {
           className={classes.textare}
           value={noteText}
           onChange={onChangeText}
+          onBlur={onBlurEditor}
         />
       )}
     </Box>
