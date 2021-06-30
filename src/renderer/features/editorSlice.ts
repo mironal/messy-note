@@ -21,6 +21,14 @@ export const editorSlice = createSlice({
       state.editingText = action.payload
       state.editingState = "modified"
     },
+
+    idleEdit: (state) => {
+      // saved だったら idle に戻す
+      // 保存後に setTimeout(() => dispatch(idleEdit()), 1000) みたいに呼び出すことを想定
+      if (state.editingState === "saved") {
+        state.editingState = "idle"
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(readNoteText.pending, (state) => {
@@ -40,6 +48,6 @@ export const editorSlice = createSlice({
   },
 })
 
-export const { editNoteText } = editorSlice.actions
+export const { editNoteText, idleEdit } = editorSlice.actions
 
 export default editorSlice.reducer

@@ -6,6 +6,7 @@ import {
   Button,
   Chip,
   ChipProps,
+  Fade,
   makeStyles,
   TextField,
   Typography,
@@ -14,7 +15,7 @@ import {
 import { notesSelector } from "../features/noteSlice"
 import { useAppDispatch, useAppSelector } from "../hooks"
 import { readNoteText, renameNote, saveNoteText } from "../features/actions"
-import { editNoteText, EditorState } from "../features/editorSlice"
+import { editNoteText, EditorState, idleEdit } from "../features/editorSlice"
 import { Done } from "@material-ui/icons"
 
 const useTitleStyles = makeStyles((theme) => ({
@@ -84,11 +85,8 @@ const EditingStateChip = ({
   props.variant = "outlined"
   switch (editingState) {
     case "loading":
-      props.label = "ロード中"
-      break
     case "idle":
-      props.label = "変更なし"
-      break
+      return null
     case "modified":
       props.label = "保存待機中"
       break
@@ -101,7 +99,11 @@ const EditingStateChip = ({
       props.icon = <Done />
       break
   }
-  return <Chip {...props} />
+  return (
+    <Fade in={true}>
+      <Chip {...props} />
+    </Fade>
+  )
 }
 
 const useStyles = makeStyles({
@@ -136,6 +138,13 @@ export const Editor = () => {
     3000 /* ms */,
     [noteText, editingState]
   )
+
+  useEffect(() => {
+    if (editingState === "saved") {
+      const handle = setTimeout(() => dispatch(idleEdit()), 1000)
+      return () => clearTimeout(handle)
+    }
+  }, [editingState])
 
   useEffect(() => {
     if (!notePath) {
